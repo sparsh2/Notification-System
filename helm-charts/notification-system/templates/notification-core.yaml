@@ -1,0 +1,56 @@
+---
+# service account for the deployment
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.notificationCore.serviceAccountName }}
+  # annotations:
+  #   kubernetes.io/enforce-mountable-secrets: ""
+  namespace: {{ .Values.namespace }}
+---
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.notificationCore.name }}-deployment
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.notificationCore.name }}
+spec:
+  replicas: {{ .Values.notificationCore.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.notificationCore.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.notificationCore.name }}
+    spec:
+      serviceAccountName: {{ .Values.notificationCore.serviceAccountName }}
+      containers:
+      - name: {{ .Values.notificationCore.name }}
+        image: {{ .Values.notificationCore.image }}
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
+
+---
+# service for the deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.notificationCore.serviceName }}
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: {{ .Values.notificationCore.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.notificationCore.servicePort }}
+      targetPort: 8080

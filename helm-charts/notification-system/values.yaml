@@ -1,0 +1,9 @@
+notificationCore:
+  name: notification-core
+  serviceName: notification-core-svc
+  servicePort: 8080
+  replicas: 2
+  image: sarodesparsh/notification-server
+  serviceAccountName: notification-core-sa
+
+namespace: notification-system
