@@ -54,3 +54,32 @@ spec:
     - protocol: TCP
       port: {{ .Values.notificationCore.servicePort }}
       targetPort: 8080
+
+
+---
+# role for tokenreview
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: validate-tokens-role
+  namespace: {{ .Values.namespace }}
+rules:
+- apiGroups: ["authentication.k8s.io"]
+  resources: ["tokenreviews"]
+  verbs: ["get","create"]
+
+---
+# rolebinding for tokenreview
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: validate-tokens-rolebinding
+  namespace: {{ .Values.namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: validate-tokens-role
+subjects:
+- kind: ServiceAccount
+  name: {{ .Values.notificationCore.serviceAccountName }}
+  namespace: {{ .Values.namespace }}
