@@ -8,5 +8,5 @@ golang-base-docker:
 	docker push $(NAMESPACE)/golang-base
 
 notification-server-docker: golang-base-docker
-	docker build -t $(NAMESPACE)/notification-server -f ./notification-server/Dockerfile ../components/ --build-arg="NAMESPACE=$(NAMESPACE)"
+	docker build -t $(NAMESPACE)/notification-server -f ./notification-server/Dockerfile ../ --build-arg="NAMESPACE=$(NAMESPACE)"
 	docker push $(NAMESPACE)/notification-server
