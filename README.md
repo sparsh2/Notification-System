@@ -10,15 +10,11 @@ Targets can be email and android push notification, and more to come.
 - Kuberentes - container orchestration engine
 - Helm - deployment of the system
 - Golang - backend implementation
+- MySQL - database
 - Kafka - message queues
 - Python - example weather service as a notification source
 - Android - simple app for push notification demonstration
 
-## Architecture
-
-
-
-
-
+## Architecture Design
 
 
