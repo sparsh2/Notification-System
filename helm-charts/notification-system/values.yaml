@@ -10,7 +10,7 @@ notificationCore:
   db:
     host: notification-system-mysql
     port: 3306
-    database: notification-system
+    database: notification_db
     user: root
     password: root
 
@@ -36,5 +36,6 @@ mysql:
         PRIMARY KEY (user_id, service_id),
         FOREIGN KEY (user_id) REFERENCES users(user_id)
       );
+      INSERT INTO users (user_id, data) VALUES ('user1', 'data1');
 
       

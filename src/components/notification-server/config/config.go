@@ -1,13 +1,19 @@
 package config
 
-import "gopkg.in/yaml.v3"
+import (
+	"fmt"
+	"io"
+	"os"
+
+	"gopkg.in/yaml.v3"
+)
 
 type DBConfig struct {
 	Host     string `yaml:"host"`
 	Port     int    `yaml:"port"`
 	User     string `yaml:"user"`
 	Password string `yaml:"password"`
-	DBName   string `yaml:"dbname"`
+	DBName   string `yaml:"database"`
 }
 
 type Config struct {
@@ -21,5 +27,15 @@ func LoadConfig() {
 	Configs = &Config{}
 	Configs.DBConfig = &DBConfig{}
 	configFilePath := "/etc/config/config.yaml"
-	yaml.Unmarshal([]byte(configFilePath), Configs)
+	f, err := os.Open(configFilePath)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	configBytes, err := io.ReadAll(f)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	yaml.Unmarshal(configBytes, Configs)
 }

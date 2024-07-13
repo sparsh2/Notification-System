@@ -7,6 +7,7 @@ type Preference struct {
 
 type SetPreferenceRequest struct {
 	Preferences []Preference `json:"preferences"`
+	ServiceID string `json:"service_id"`
 	UserID string `json:"user_id"`
 }
 
