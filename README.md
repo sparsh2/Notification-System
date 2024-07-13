@@ -16,5 +16,5 @@ Targets can be email and android push notification, and more to come.
 - Android - simple app for push notification demonstration
 
 ## Architecture Design
-
+![Architecture Diagram](assets/notification-system-architecture.png)
 
