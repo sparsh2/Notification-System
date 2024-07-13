@@ -1,7 +1,6 @@
 package web
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -13,7 +12,6 @@ import (
 func AuthMiddleware(c *gin.Context) {
 	// Auth middleware
 	tokenList := strings.Split(c.Request.Header.Get("Authorization"), "Bearer ")
-	fmt.Println(tokenList)
 	if len(tokenList) != 2 {
 		c.JSON(401, gin.H{
 			"error": "Unauthorized",
@@ -37,7 +35,7 @@ func AuthMiddleware(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "Unauthorized",
-			"msg":  err.Error(),
+			"msg":   err.Error(),
 		})
 		c.Abort()
 		return

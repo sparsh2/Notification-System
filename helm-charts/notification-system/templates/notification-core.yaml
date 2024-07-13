@@ -30,15 +30,25 @@ spec:
       serviceAccountName: {{ .Values.notificationCore.serviceAccountName }}
       containers:
       - name: {{ .Values.notificationCore.name }}
-        image: {{ .Values.notificationCore.image }}
+        image: {{ .Values.dockerUsername }}/{{ .Values.notificationCore.image }}
         ports:
         - containerPort: 8080
         livenessProbe:
           httpGet:
             path: /ping
             port: 8080
-          initialDelaySeconds: 3
-          periodSeconds: 3
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ .Values.notificationCore.configMapName }}
+          items:
+          - key: config.yaml
+            path: config.yaml
 
 ---
 # service for the deployment
@@ -83,3 +93,19 @@ subjects:
 - kind: ServiceAccount
   name: {{ .Values.notificationCore.serviceAccountName }}
   namespace: {{ .Values.namespace }}
+
+---
+# config map for the deployment
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.notificationCore.configMapName }}
+  namespace: {{ .Values.namespace }}
+data:
+  config.yaml: |-
+    db:
+      host: {{ .Values.notificationCore.db.host }}
+      port: {{ .Values.notificationCore.db.port }}
+      database: {{ .Values.notificationCore.db.database }}
+      user: {{ .Values.notificationCore.db.user }}
+      password: {{ .Values.notificationCore.db.password }}

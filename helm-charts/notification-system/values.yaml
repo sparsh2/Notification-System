@@ -1,9 +1,40 @@
+dockerUsername: sarodesparsh
 notificationCore:
   name: notification-core
   serviceName: notification-core-svc
   servicePort: 8080
-  replicas: 2
-  image: sarodesparsh/notification-server
+  replicas: 1
+  image: notification-server
   serviceAccountName: notification-core-sa
+  configMapName: notification-core-config
+  db:
+    host: notification-system-mysql
+    port: 3306
+    database: notification-system
+    user: root
+    password: root
+
 
 namespace: notification-system
+mysql:
+  auth:
+    rootPassword: root
+    database: notification_db
+  namespaceOverride: notification-system
+  initdbScripts:
+    initdb.sql: |
+      CREATE DATABASE IF NOT EXISTS notification_db;
+      CREATE TABLE users (
+        user_id VARCHAR(255),
+        data VARCHAR(2048),
+        PRIMARY KEY (user_id)
+      );
+      CREATE TABLE user_preferences (
+        user_id VARCHAR(255),
+        service_id VARCHAR(255),
+        preferences VARCHAR(2048),
+        PRIMARY KEY (user_id, service_id),
+        FOREIGN KEY (user_id) REFERENCES users(user_id)
+      );
+
+      
