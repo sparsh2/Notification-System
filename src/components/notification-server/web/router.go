@@ -19,9 +19,57 @@ func GetRouter() *gin.Engine {
 
 	authG := r.Group("/api/v1/")
 	authG.Use(AuthMiddleware)
-	authG.POST("/set-preference", setPreference)
+	authG.PUT("/set-preference", setPreference)
+	authG.POST("/set-user-details", setUserDetails)
+	authG.POST("/register-service", registerService)
 
 	return r
+}
+
+func registerService(c *gin.Context) {
+	// TODO: Implement later. Not needed for now
+	c.JSON(200, gin.H{
+		"message": "Service registered successfully",
+	})
+}
+
+func setUserDetails(c *gin.Context) {
+	bytes, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "Bad Request",
+			"msg":   err.Error(),
+		})
+		return
+	}
+	userDetailsReq := &types.SetUserDetailsRequest{}
+	err = json.Unmarshal(bytes, userDetailsReq)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "Bad Request",
+			"msg":   err.Error(),
+		})
+		return
+	}
+	if userDetailsReq.Email == "" || userDetailsReq.UserID == "" {
+		c.JSON(400, gin.H{
+			"error": "Bad Request",
+			"msg":   "Email and User ID is required",
+		})
+		return
+	}
+	userDetailsReq.ServiceID = c.GetString("account")
+	err = services.Service.SetUserDetails(userDetailsReq)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Internal Server Error",
+			"msg":   err.Error(),
+		})
+		return
+	}
+	c.JSON(200, gin.H{
+		"message": "User details set successfully",
+	})
 }
 
 func setPreference(c *gin.Context) {
@@ -42,7 +90,7 @@ func setPreference(c *gin.Context) {
 		})
 		return
 	}
-	preferencesReq.ServiceID = c.GetString("service_id")
+	preferencesReq.ServiceID = c.GetString("account")
 	err = services.Service.SetPreference(preferencesReq)
 	if err != nil {
 		c.JSON(500, gin.H{
