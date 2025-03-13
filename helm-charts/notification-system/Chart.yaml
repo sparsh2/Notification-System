@@ -26,3 +26,6 @@ dependencies:
 - name: mysql
   version: "11.1.9"
   repository: https://charts.bitnami.com/bitnami
+- name: kafka
+  version: "26.6.1"
+  repository: https://charts.bitnami.com/bitnami

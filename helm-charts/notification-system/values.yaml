@@ -14,6 +14,19 @@ notificationCore:
     user: root
     password: root
 
+notificationWorker:
+  name: notification-worker
+  replicas: 1
+  image: notification-worker
+  configMapName: notification-worker-config
+  env:
+    KAFKA_BOOTSTRAP_SERVERS: notification-system-kafka:9092
+    SMTP_SERVER: smtp.gmail.com
+    SMTP_PORT: "587"
+  secrets:
+    smtpUsername: "your-email@gmail.com"  # Change this in production
+    smtpPassword: "your-app-password"     # Change this in production
+    fcmApiKey: "your-fcm-api-key"        # Change this in production
 
 namespace: notification-system
 mysql:
@@ -31,5 +44,24 @@ mysql:
         user_data VARCHAR(2048),
         PRIMARY KEY (user_id, service_id)
       )
+
+kafka:
+  nameOverride: kafka
+  namespaceOverride: notification-system
+  replicaCount: 1
+  deleteTopicEnable: true
+  autoCreateTopicsEnable: true
+  defaultReplicationFactor: 1
+  numPartitions: 1
+  zookeeper:
+    enabled: true
+  externalAccess:
+    enabled: true
+    service:
+      type: NodePort
+      nodePorts: [31092]
+  persistence:
+    enabled: true
+    size: 1Gi
 
       
