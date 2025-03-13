@@ -22,6 +22,7 @@ func GetRouter() *gin.Engine {
 	authG.PUT("/set-preference", setPreference)
 	authG.POST("/set-user-details", setUserDetails)
 	authG.POST("/register-service", registerService)
+	authG.POST("/send-notification", sendNotification)
 
 	return r
 }
@@ -101,5 +102,52 @@ func setPreference(c *gin.Context) {
 	}
 	c.JSON(200, gin.H{
 		"message": "Preference set successfully",
+	})
+}
+
+func sendNotification(c *gin.Context) {
+	bytes, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "Bad Request",
+			"msg":   err.Error(),
+		})
+		return
+	}
+
+	notificationReq := &types.NotificationRequest{}
+	err = json.Unmarshal(bytes, notificationReq)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "Bad Request",
+			"msg":   err.Error(),
+		})
+		return
+	}
+
+	// Validate required fields
+	if notificationReq.Title == "" || notificationReq.Message == "" || notificationReq.UserID == "" {
+		c.JSON(400, gin.H{
+			"error": "Bad Request",
+			"msg":   "Title, Message and User ID are required",
+		})
+		return
+	}
+
+	// Set service ID from auth context
+	notificationReq.ServiceID = c.GetString("account")
+
+	// Send to Kafka
+	err = services.Kafka.SendNotification(notificationReq)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": "Internal Server Error",
+			"msg":   err.Error(),
+		})
+		return
+	}
+
+	c.JSON(200, types.NotificationResponse{
+		Success: true,
 	})
 }

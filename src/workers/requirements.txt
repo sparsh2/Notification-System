@@ -1,0 +1,4 @@
+kafka-python==2.0.2
+pyfcm==1.5.4
+python-dotenv==1.0.0
+mysql-connector-python==8.1.0 
